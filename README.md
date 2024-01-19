@@ -1,4 +1,4 @@
-# Semantic Segmentation API
+# Semantic Segmentation API - Tensorflow
 
 ## Overview
 
@@ -12,18 +12,18 @@ This API leverages DeepLabV3+ with a ResNet50 backbone to perform binary semanti
 - PIL
 - FastAPI
 - Uvicorn
-- PyTorch
+- Tensorflow/Keras
 
 ### Installation
 
 - Clone the repository
 ```bash
-git clone https://github.com/mukund-ks/Backend-SSPSDLFAM
+git clone https://github.com/mukund-ks/Semantic-Seg-API-Tensorflow
 ```
 
 - Change directory
 ```bash
-cd Backend-SSPSDLFAM
+cd Semantic-Seg-API-Tensorflow
 ```
 
 - Create a 'weights' directory under 'src' and place your model weights there
@@ -95,6 +95,3 @@ No authentication is currently required for this API.
 
 ## Contributing
 Contributions are welcomed! Feel free to submit issues, feature requests, or pull requests.
-
-> [!NOTE]  
-> This project is part of the Capstone Project for college.
