@@ -56,7 +56,7 @@ docker build -t seg-api-tensorflow .
 
 Run the Docker container:
 ```bash
-docker run -p 5000:8000 seg-api-tensorflow
+docker run -p 5000:8080 seg-api-tensorflow
 ```
 
 The API will be accessible at `http://localhost:5000`.
@@ -70,7 +70,7 @@ docker pull mukundks/seg-api-tensorflow:latest
 
 Run the Docker container:
 ```bash
-docker run -p 5000:8000 mukundks/seg-api-tensorflow:latest
+docker run -p 5000:8080 mukundks/seg-api-tensorflow:latest
 ```
 
 The API will be accessible at `http://localhost:5000`.
