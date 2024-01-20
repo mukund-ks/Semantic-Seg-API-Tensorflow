@@ -1,0 +1,6 @@
+env/
+__pycache__/
+test.py
+test_img.png
+predicted_image.png
+.gitignore
