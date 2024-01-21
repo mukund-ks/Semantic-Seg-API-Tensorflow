@@ -83,4 +83,4 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.get("/")
 async def root():
-    return {"message": "API for Capstone!"}
+    return {"message": "Semantic Segmentation API - Tensorflow backed model."}
