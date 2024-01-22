@@ -7,8 +7,8 @@ from io import BytesIO
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from src.metrics import iou as model_iou, calc_loss, dice_coef
+from schemas import PredRequest, PredResponse, ExceptionResponse
 
 
 app = FastAPI()
@@ -19,17 +19,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class PredRequest(BaseModel):
-    img_base64: str
-
-
-class PredResponse(BaseModel):
-    mask: str
-
-class ExceptionResponse(BaseModel):
-    message: str
 
 async def run_model(img_arr: np.ndarray[np.float32]):
     with CustomObjectScope({"iou": model_iou, "dice_coef": dice_coef, "dice_loss": calc_loss}):
