@@ -28,6 +28,8 @@ class PredRequest(BaseModel):
 class PredResponse(BaseModel):
     mask: str
 
+class ExceptionResponse(BaseModel):
+    message: str
 
 async def run_model(img_arr: np.ndarray[np.float32]):
     with CustomObjectScope({"iou": model_iou, "dice_coef": dice_coef, "dice_loss": calc_loss}):
@@ -54,7 +56,8 @@ async def run_model(img_arr: np.ndarray[np.float32]):
 @app.post("/segment", response_model=PredResponse)
 async def segment(payload: PredRequest):
     try:
-        image_data = base64.b64decode(payload.img_base64)
+        image_dict = payload.model_dump()
+        image_data = base64.b64decode(image_dict["img_base64"])
 
         with Image.open(BytesIO(image_data)) as pil_img:
             img_arr = np.array(pil_img.convert("RGB"), dtype=np.float32)
@@ -67,7 +70,10 @@ async def segment(payload: PredRequest):
 
         pred_res = await run_model(img_arr)
 
-        return JSONResponse(status_code=200, content={"mask": pred_res})
+        res = PredResponse(mask=pred_res)
+        res_dict = res.model_dump()
+
+        return JSONResponse(status_code=200, content=res_dict)
     except Exception as e:
         print(f"Error in run_model: {str(e)}")
         raise HTTPException(
@@ -78,7 +84,9 @@ async def segment(payload: PredRequest):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(status_code=exc.status_code, content={"message": f"{exc.detail}"})
+    res = ExceptionResponse(message=exc.detail)
+    res_dict = res.model_dump()
+    return JSONResponse(status_code=exc.status_code, content=res_dict)
 
 
 @app.get("/")
