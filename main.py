@@ -1,15 +1,17 @@
 import base64
-import numpy as np
-from keras.utils import CustomObjectScope
-from keras.models import load_model
-from PIL import Image
 from io import BytesIO
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from src.metrics import iou as model_iou, calc_loss, dice_coef
-from schemas import PredRequest, PredResponse, ExceptionResponse
 
+import numpy as np
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from keras.models import load_model
+from keras.utils import CustomObjectScope
+from PIL import Image
+
+from schemas import ExceptionResponse, PredRequest, PredResponse
+from src.metrics import calc_loss, dice_coef
+from src.metrics import iou as model_iou
 
 app = FastAPI()
 
@@ -20,7 +22,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def run_model(img_arr: np.ndarray[np.float32]):
+
+def bytesToBase64(pred_bytes: bytes) -> str:
+    output_buffer = BytesIO()
+
+    pred_img = Image.frombytes("L", (256, 256), pred_bytes)
+    pred_img.save(output_buffer, format="PNG")
+
+    pred_str = base64.b64encode(output_buffer.getvalue()).decode("utf-8")
+    return pred_str
+
+
+async def run_model(img_arr: np.ndarray[np.float32]) -> str:
     with CustomObjectScope({"iou": model_iou, "dice_coef": dice_coef, "dice_loss": calc_loss}):
         model = load_model("src/weights/model.h5")
 
@@ -37,7 +50,7 @@ async def run_model(img_arr: np.ndarray[np.float32]):
 
     pred_bytes = (pred * 255).astype(np.uint8).tobytes()
 
-    base64_pred = base64.b64encode(pred_bytes).decode("utf-8")  # .decode('utf-8') to convert to str
+    base64_pred = bytesToBase64(pred_bytes)
 
     return base64_pred
 
